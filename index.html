@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<!--
+  ┌─ index.html ─────────────────────────────────────────────────────
+  │ Лендинг: текст / карточки / попапы / события — всё здесь (KZ)
+  │ Ссылка на APK, пиксель FB, контакт — не здесь → правь public/config.js
+  │ Деплой: git push → Cloudflare Pages собирает сам (npm run build → dist)
+  └───────────────────────────────────────────────────────────────
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08080A">
+<title>РемоДива — она далеко, пульт у тебя</title>
+<meta name="description" content="Девушки онлайн по всему Казахстану. В момент согласия твой палец становится переключателем. Только Android, без регистрации.">
+<meta property="og:title" content="РемоДива — она далеко, пульт у тебя">
+<meta property="og:description" content="Управляй издалека — только с её согласия.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#08080A;
+  --bg2:#0E0E12;
+  --surface:#14141A;
+  --surface2:#1B1B23;
+  --line:rgba(255,255,255,.08);
+  --text:#F2F2F5;
+  --text2:#8A8A96;
+  --pink:#FF3F6E;
+  --pink-dim:#B0274B;
+  --green:#2BE39A;
+  --radius:16px;
+  --font:"Inter","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --display:"Inter","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font);
+  font-size:15px;line-height:1.75;letter-spacing:.02em;
+  overflow-x:hidden;padding-bottom:calc(92px + env(safe-area-inset-bottom));
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(55% 32% at 50% -4%, rgba(255,63,110,.22), transparent 72%),
+    radial-gradient(40% 26% at 88% 44%, rgba(43,227,154,.07), transparent 70%);
+}
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 18px}
+h1,h2,h3{font-family:var(--display);line-height:1.34;letter-spacing:.035em;margin:0}
+p{margin:0}
+section{padding:52px 0 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sec-head h2{font-size:20px;font-weight:700}
+.sec-head span{font-size:11px;color:var(--text2);letter-spacing:.1em;white-space:nowrap}
+
+/* ── Шапка ── */
+.top{display:flex;align-items:center;justify-content:space-between;padding:16px 0 4px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:16.5px;letter-spacing:.08em}
+.brand img{width:26px;height:26px;border-radius:50%;display:block;box-shadow:0 0 14px rgba(255,63,110,.35)}
+.brand i{width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink)}
+.tagline{font-size:10px;color:var(--text2);letter-spacing:.16em}
+
+/* ── Первый экран ── */
+.hero{padding-top:16px;padding-bottom:14px;text-align:center}
+.hero .kicker{
+  display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.22em;
+  color:var(--pink);border:1px solid rgba(255,63,110,.3);border-radius:999px;padding:5px 12px;
+}
+.hero .kicker b{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.hero h1{margin-top:18px;font-size:clamp(27px,7.6vw,36px);font-weight:800;line-height:1.28}
+.hero h1 em{font-style:normal;color:var(--pink)}
+.hero .sub{margin-top:12px;color:var(--text2);font-size:13.5px;line-height:1.85}
+
+/* Пульт */
+.remote-stage{position:relative;margin:20px auto 0;width:min(40vw,138px)}
+.remote-stage::before{
+  content:"";position:absolute;inset:-14% -34%;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(255,63,110,.26), transparent 72%);
+  filter:blur(6px);z-index:-1;
+}
+svg.remote{width:100%;height:auto;display:block}
+.led{animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
+.pulse{transform-origin:100px 158px;animation:pulse 2.6s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.92);opacity:.55}70%{transform:scale(1.22);opacity:0}100%{opacity:0}}
+.levelbar{transition:width .5s cubic-bezier(.16,1,.3,1)}
+.remote .btn-core{cursor:pointer}
+
+.tap-hint{text-align:center;color:var(--pink);font-size:11px;letter-spacing:.06em;margin-top:8px;opacity:.85}
+.live.reacting{background:rgba(255,63,110,.1);border-color:rgba(255,63,110,.35);color:#FFD9E1;max-width:100%}
+.live.reacting b{color:var(--pink)}
+@keyframes shakeit{0%,100%{transform:translate(0,0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,-2px)}80%{transform:translate(1px,2px)}}
+.shake{animation:shakeit .32s ease}
+@keyframes popbtn{0%{transform:scale(1)}45%{transform:scale(.93)}100%{transform:scale(1)}}
+.pop{animation:popbtn .26s ease}
+.remote-explain{text-align:center;font-size:12.5px;line-height:1.95;color:#FFD9E1;margin:16px auto 0;max-width:100%;text-wrap:balance;letter-spacing:.01em}
+.live{
+  display:inline-flex;align-items:center;gap:8px;margin-top:20px;
+  font-size:12px;color:var(--text);background:rgba(43,227,154,.08);
+  border:1px solid rgba(43,227,154,.24);border-radius:999px;padding:7px 14px;
+}
+.live b{color:var(--green);font-variant-numeric:tabular-nums;font-size:15px;font-weight:700}
+.live .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.8s infinite}
+
+/* Кнопки ── */
+.cta{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;height:56px;margin-top:20px;border:0;border-radius:14px;
+  background:linear-gradient(135deg,#FF5C82,#E01E4F);color:#fff;
+  font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:.06em;
+  cursor:pointer;box-shadow:0 10px 30px rgba(224,30,79,.28);
+  transition:transform .15s ease,box-shadow .2s ease;
+}
+.cta:active{transform:translateY(1px);box-shadow:0 4px 14px rgba(224,30,79,.24)}
+.cta.ghost{background:transparent;color:var(--text);border:1px solid var(--line);box-shadow:none;height:50px;font-size:15px;font-weight:600}
+.cta[disabled]{opacity:.75}
+.note{text-align:center;color:var(--text2);font-size:11px;margin-top:10px;letter-spacing:.04em}
+
+/* ── Сетка девушек ── */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.girl{
+  position:relative;border-radius:13px;overflow:hidden;background:var(--surface);
+  border:1px solid var(--line);cursor:pointer;
+  transition:transform .18s ease,border-color .2s ease;
+}
+.girl:active{transform:scale(.975)}
+.girl .ph{position:relative;aspect-ratio:3/4;background:
+  linear-gradient(160deg,#2A1E28,#16121A 60%,#0F0D12);overflow:hidden}
+.girl .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.girl .sil{position:absolute;inset:auto 0 0 0;width:100%;height:78%;fill:rgba(255,255,255,.075);z-index:0}
+.girl .ph img+z?{}
+.badge{
+  position:absolute;top:6px;right:6px;z-index:2;
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:8.5px;font-weight:700;letter-spacing:.04em;
+  padding:3px 6px;border-radius:5px;backdrop-filter:blur(6px);
+}
+.badge i{width:4.5px;height:4.5px;border-radius:50%}
+.badge--idle{background:rgba(43,227,154,.16);color:var(--green);border:1px solid rgba(43,227,154,.34)}
+.badge--idle i{background:var(--green);box-shadow:0 0 6px var(--green)}
+.badge--busy{background:rgba(255,63,110,.16);color:var(--pink);border:1px solid rgba(255,63,110,.34)}
+.badge--busy i{background:var(--pink)}
+.girl .meta{padding:7px 8px 9px}
+.girl .nm{font-size:12px;font-weight:700;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.girl .nm small{font-weight:400;color:var(--text2);font-size:10px;margin-left:3px}
+.girl .sc{font-size:9.5px;color:var(--text2);line-height:1.5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ask{
+  display:block;width:100%;margin-top:7px;padding:6px 0;
+  border-radius:8px;border:1px solid rgba(255,63,110,.42);
+  background:rgba(255,63,110,.13);color:#FF8AA4;
+  font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.02em;
+  cursor:pointer;transition:background .18s ease,border-color .18s ease;
+}
+.ask:active{background:rgba(255,63,110,.24)}
+.ask.busy{
+  border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.05);
+  color:#A2A6B4;cursor:pointer;
+}
+.ask.busy:active{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.24)}
+.grid-note b{color:var(--text);font-weight:700}
+.grid-note{margin-top:12px;font-size:11px;color:var(--text2);line-height:1.7}
+
+/* ── Шаги ── */
+.steps{counter-reset:s;margin:0;padding:0;list-style:none}
+.steps li{counter-increment:s;position:relative;padding:0 0 22px 44px}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:1px;width:27px;height:27px;
+  display:grid;place-items:center;border-radius:50%;
+  background:rgba(255,63,110,.12);color:var(--pink);font-size:12px;font-weight:700;
+}
+.steps li::after{content:"";position:absolute;left:13px;top:31px;bottom:6px;width:1px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps b{display:block;font-size:15px;margin-bottom:3px;letter-spacing:.02em}
+.steps p{font-size:12.5px;color:var(--text2);line-height:1.72}
+
+/* ── Демо ── */
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.demo .row{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.demo .lbl{font-size:11px;color:var(--text2);letter-spacing:.1em}
+.switch{
+  position:relative;width:64px;height:34px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);cursor:pointer;transition:background .25s ease,border-color .25s;
+}
+.switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;
+  background:#4A4A55;transition:transform .28s cubic-bezier(.16,1,.3,1),background .25s;
+}
+.switch.on{background:rgba(255,63,110,.2);border-color:rgba(255,63,110,.5)}
+.switch.on::after{transform:translateX(30px);background:var(--pink);box-shadow:0 0 14px var(--pink)}
+.demo .stat{font-size:12px;color:var(--text2);margin-top:14px;min-height:20px}
+.demo .stat b{color:var(--pink)}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+  background:var(--surface2);outline:none;margin-top:8px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--pink);box-shadow:0 0 12px rgba(255,63,110,.6);cursor:pointer;
+}
+.demo-hint{font-size:10.5px;color:var(--text2);margin-top:12px}
+
+/* ── Факты ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.feat{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px}
+.feat .n{font-family:var(--display);font-size:19px;font-weight:800;color:var(--pink);letter-spacing:.02em}
+.feat h3{font-size:13px;margin-top:6px;font-weight:700}
+.feat p{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.65}
+
+/* ── Согласие ── */
+.consent{border:1px solid rgba(43,227,154,.22);background:rgba(43,227,154,.045);border-radius:var(--radius);padding:20px}
+.consent h2{font-size:17px;color:var(--green)}
+.consent p{margin-top:10px;font-size:12.5px;color:#C9C9D2;line-height:1.8}
+.consent ul{margin:12px 0 0;padding-left:16px;color:var(--text2);font-size:12px;line-height:1.9}
+
+/* ── Финальный CTA ── */
+.final{text-align:center;padding-bottom:8px}
+.final h2{font-size:22px;line-height:1.45}
+.final .sub{margin-top:10px;color:var(--text2);font-size:12.5px}
+
+/* ── Подвал ── */
+footer.legal{padding:34px 0 24px;color:var(--text2);font-size:11px;line-height:2.1}
+footer.legal a{color:var(--text2);text-decoration:none;border-bottom:1px solid var(--line);margin-right:12px}
+.disclaimer{margin-top:14px;color:#61616C}
+
+/* ── Панель снизу ── */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  padding:10px 18px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(8,8,10,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+}
+.bar .inner{max-width:480px;margin:0 auto;display:flex;gap:9px;align-items:center}
+.bar .cta{margin:0;height:50px;font-size:16px}
+.bar .mini{flex:0 0 auto;font-size:10px;color:var(--text2);line-height:1.4;text-align:center}
+
+/* ── Возрастной шлюз ── */
+#gate{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:rgba(4,4,6,.97);padding:24px;text-align:center}
+#gate.on{display:grid}
+#gate h2{font-size:19px}
+#gate p{color:var(--text2);font-size:12.5px;margin-top:12px;line-height:1.9}
+#gate .row{display:flex;gap:9px;margin-top:22px;width:100%;max-width:320px}
+#gate button{flex:1;height:50px;border-radius:12px;border:0;font-size:15px;font-weight:700;cursor:pointer}
+#gate .yes{background:linear-gradient(135deg,#FF5C82,#E01E4F);color:#fff}
+#gate .no{background:transparent;color:var(--text2);border:1px solid var(--line)}
+
+/* ── Нижняя панель ── */
+#sheet{position:fixed;inset:0;z-index:110;display:none;align-items:flex-end;background:rgba(0,0,0,.66)}
+#sheet.on{display:flex}
+#sheet .panel{width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;border-top:1px solid var(--line)}
+#sheet .ttl{display:flex;align-items:center;gap:10px}
+#sheet .ttl h3{font-size:16px}
+#sheet .st{font-size:10px;padding:2px 7px;border-radius:5px;white-space:nowrap;font-weight:700}
+#sheet .st.idle{background:rgba(43,227,154,.16);color:var(--green);border:1px solid rgba(43,227,154,.34)}
+#sheet .st.busy{background:rgba(255,63,110,.16);color:var(--pink);border:1px solid rgba(255,63,110,.34)}
+#sheet .sh-body{color:var(--text2);font-size:12.5px;margin-top:12px;white-space:pre-line;line-height:1.8}
+
+/* ── Имитация предупреждения Play Protect ── */
+.mock{background:#1E1E24;border:1px solid #30303A;border-radius:12px;padding:14px;margin-top:12px}
+.mock .m-top{font-size:9.5px;color:#8A8A96;letter-spacing:.1em}
+.mock .m-title{font-size:13px;font-weight:700;color:#F2F2F5;margin-top:8px;line-height:1.55}
+.mock .m-note{font-size:10.5px;color:#8A8A96;margin-top:6px;line-height:1.65}
+.mock .m-btns{display:flex;gap:8px;margin-top:12px}
+.mock .m-btn{flex:1;text-align:center;font-size:11px;padding:7px 0;border-radius:8px;background:#26262E;color:#C9C9D2}
+.mock .m-btn.primary{background:rgba(43,227,154,.16);color:var(--green);border:1px solid rgba(43,227,154,.35)}
+.warnbox{background:rgba(255,63,110,.05);border:1px solid rgba(255,63,110,.22);border-radius:14px;padding:16px;margin-bottom:20px}
+.warnbox h3{font-size:13.5px;color:#FF8AA4;display:flex;align-items:center;gap:6px}
+.warnbox h3 svg{width:15px;height:15px;flex:0 0 auto}
+.warnbox p{font-size:11.5px;color:var(--text2);line-height:1.8;margin-top:8px}
+.warnbox .fix{margin-top:10px;font-size:11.5px;color:#C9C9D2;line-height:1.9}
+.warnbox .fix b{color:var(--text)}
+
+/* Панель подтверждения загрузки */
+.dlwarn-h{font-size:13px;font-weight:700;color:#FF8AA4;margin-bottom:8px}
+.dlwarn p{font-size:12px;color:#B9B9C4;line-height:1.85;margin-top:8px}
+.dlwarn .dlwarn-fix{color:#F2F2F5;margin-top:12px}
+.dlwarn .dlwarn-fix b{color:#FF8AA4}
+.dlwarn .dlwarn-meta{margin-top:12px;font-size:10.5px;color:#6E6E7A;letter-spacing:.02em}
+#sheet .actions{display:flex;gap:9px;margin-top:18px}
+#sheet button{flex:1;height:48px;border-radius:12px;border:0;font-size:14px;font-weight:700;cursor:pointer}
+#sheet .close{background:var(--surface2);color:var(--text2);flex:0 0 92px}
+#sheet .go{background:linear-gradient(135deg,#FF5C82,#E01E4F);color:#fff}
+
+/* ── Просмотр (только чтение) ── */
+#viewer{position:fixed;inset:0;z-index:120;display:none;background:#06060A;overflow-y:auto}
+#viewer.on{display:block}
+#viewer .vwrap{max-width:480px;margin:0 auto;padding:16px 18px calc(24px + env(safe-area-inset-bottom))}
+.vhead{display:flex;align-items:center;gap:9px;padding:6px 0 14px}
+.vname{font-family:var(--display);font-size:14px;font-weight:700}
+.vrbadge{font-size:9.5px;letter-spacing:.06em;padding:3px 7px;border-radius:5px;
+  background:rgba(255,255,255,.07);color:#A2A6B4;border:1px solid rgba(255,255,255,.14)}
+.vclose{margin-left:auto;width:32px;height:32px;border-radius:50%;border:0;
+  background:rgba(255,255,255,.07);color:var(--text2);font-size:17px;cursor:pointer;line-height:1}
+.vstage{position:relative;aspect-ratio:3/4;border-radius:16px;overflow:hidden;
+  background-color:#1A1119;background-size:cover;background-position:center top;
+  border:1px solid rgba(255,255,255,.07)}
+.vstage .vsil{position:absolute;left:0;right:0;bottom:0;width:100%;height:88%;
+  fill:rgba(255,255,255,.14);filter:blur(2.5px);transition:opacity .4s ease}
+.vstage::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg, rgba(8,8,12,.35) 0%, rgba(8,8,12,.15) 45%, rgba(6,6,10,.75) 100%);
+  backdrop-filter:blur(3px) saturate(1.15)}
+.vstage::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px)}
+.vstage .vgrain{position:absolute;inset:0;z-index:1;background:
+  radial-gradient(circle at 30% 70%, rgba(255,63,110,.16), transparent 55%),
+  radial-gradient(circle at 72% 34%, rgba(43,227,154,.08), transparent 50%)}
+.vlive{position:absolute;top:10px;left:10px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+  font-size:9px;font-weight:700;letter-spacing:.1em;color:#fff;
+  background:rgba(255,63,110,.9);padding:3px 7px;border-radius:4px}
+.vlive i{width:4px;height:4px;border-radius:50%;background:#fff;animation:blink 1.4s infinite}
+.vtime{position:absolute;top:10px;right:10px;z-index:3;font-size:9px;letter-spacing:.08em;color:#C9C9D2;
+  background:rgba(0,0,0,.45);padding:3px 7px;border-radius:4px;font-variant-numeric:tabular-nums}
+.vnote{margin-top:16px;font-size:12.5px;color:var(--text2);line-height:1.85}
+.vnote b{color:#C9C9D2}
+.vremote{display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.vremote .rl{font-size:10px;letter-spacing:.12em;color:var(--text2)}
+.vremote .sw{position:relative;width:46px;height:24px;border-radius:999px;
+  background:#22222A;border:1px solid var(--line);margin-left:auto}
+.vremote .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;
+  border-radius:50%;background:#4A4A55}
+.vremote .lock{font-size:10px;color:#7A7A88;letter-spacing:.04em}
+.vactions{display:flex;gap:9px;margin-top:18px}
+.vactions button{flex:1;height:50px;border-radius:12px;border:0;font-size:14px;font-weight:700;cursor:pointer}
+.vactions .vclose2{flex:0 0 100px;background:var(--surface2);color:var(--text2)}
+.vactions .vgo{background:linear-gradient(135deg,#FF5C82,#E01E4F);color:#fff}
+
+/* ── Встроенный браузер ── */
+#inapp{position:fixed;inset:0;z-index:130;display:none;place-items:center;padding:20px;
+  background:rgba(0,0,0,.74);backdrop-filter:blur(4px)}
+#inapp.on{display:grid}
+.ia-card{width:100%;max-width:420px;background:#15151C;border:1px solid rgba(255,255,255,.09);
+  border-radius:18px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.ia-card h3{font-size:16.5px;letter-spacing:.02em}
+.ia-card .lead{margin-top:10px;font-size:12.5px;color:var(--text2);line-height:1.85}
+.ia-steps{margin-top:15px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.05);
+  border-radius:12px;padding:14px 15px}
+.ia-steps div{font-size:12.5px;line-height:2;color:#C9C9D2}
+.ia-steps div b{color:#FF8AA4}
+.ia-actions{display:flex;gap:9px;margin-top:16px}
+.ia-actions button{flex:1;height:46px;border-radius:11px;border:0;font-size:13px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.ia-actions svg{width:15px;height:15px}
+.ia-open{background:linear-gradient(135deg,#FF5C82,#E01E4F);color:#fff}
+.ia-copy{background:rgba(255,255,255,.06);color:#C9C9D2;border:1px solid rgba(255,255,255,.1)}
+.ia-later{display:block;width:100%;margin-top:12px;padding:10px 0;border:0;background:none;
+  color:#7C7C8A;font-family:var(--font);font-size:12px;letter-spacing:.02em;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.18)}
+.ia-later:active{color:#A2A6B4}
+.ia-toast{margin-top:11px;font-size:11px;color:var(--green);text-align:center;min-height:15px;letter-spacing:.02em}
+.ia-hint{margin-top:8px;font-size:10.5px;color:#6E6E7A;line-height:1.7;text-align:center}
+
+/* ── Карточки режимов ── */
+.plays{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.play{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 14px;position:relative;overflow:hidden}
+.play::after{content:"";position:absolute;right:-24px;top:-24px;width:64px;height:64px;border-radius:50%;background:rgba(255,63,110,.07)}
+.play .ic{width:22px;height:22px;color:var(--pink);margin-bottom:10px;position:relative;z-index:1}
+.play h3{font-size:13px;font-weight:700;letter-spacing:.02em;position:relative;z-index:1}
+.play p{font-size:10.5px;color:var(--text2);line-height:1.7;margin-top:5px;position:relative;z-index:1}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .led,.pulse,.live .dot{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><img src="assets/logo-64.png" alt="" width="26" height="26">РемоДива</div>
+    <div class="tagline">18+ / ANDROID</div>
+  </div>
+</div>
+
+<!-- ① Первый экран -->
+<div class="wrap hero">
+  <span class="kicker"><b></b>LIVE MATCHING</span>
+  <h1>Одно нажатие —<br><em>а она чувствует.</em></h1>
+  <p class="sub">Игрушка внутри неё — под твоим пальцем.<br>Получил согласие — и пульт ожил.</p>
+
+  <div class="remote-stage" id="remoteStage">
+    <svg class="remote" viewBox="0 0 200 418" xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0" aria-label="Нажми на кнопку пульта">
+      <defs>
+        <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#26262F"/><stop offset=".55" stop-color="#14141A"/><stop offset="1" stop-color="#0C0C10"/>
+        </linearGradient>
+        <radialGradient id="btn" cx=".35" cy=".3" r=".85">
+          <stop offset="0" stop-color="#FF7D9C"/><stop offset=".55" stop-color="#FF3F6E"/><stop offset="1" stop-color="#B0274B"/>
+        </radialGradient>
+        <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".10"/><stop offset=".35" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <rect x="26" y="6" width="148" height="404" rx="48" fill="url(#body)" stroke="#3A3A46" stroke-width="1"/>
+      <rect x="26" y="6" width="148" height="404" rx="48" fill="url(#gloss)"/>
+
+      <circle class="led" cx="100" cy="40" r="4.5" fill="#2BE39A"/>
+      <rect x="76" y="57" width="48" height="3" rx="1.5" fill="#2A2A33"/>
+
+      <circle class="pulse" cx="100" cy="158" r="54" fill="none" stroke="#FF3F6E" stroke-width="1.4"/>
+      <circle class="btn-core" cx="100" cy="158" r="46" fill="url(#btn)"/>
+      <circle cx="100" cy="158" r="46" fill="none" stroke="#FF9FB5" stroke-opacity=".5" stroke-width="1"/>
+      <path d="M100 140v36M82 158h36" stroke="#3A0B1B" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+
+      <rect x="66" y="232" width="68" height="7" rx="3.5" fill="#1C1C24"/>
+      <rect class="levelbar" x="66" y="232" width="24" height="7" rx="3.5" fill="#FF3F6E"/>
+
+      <circle cx="82" cy="278" r="13" fill="#1B1B23" stroke="#33333D"/>
+      <path d="M77 278h10" stroke="#8A8A96" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="118" cy="278" r="13" fill="#1B1B23" stroke="#33333D"/>
+      <path d="M113 278h10M118 273v10" stroke="#8A8A96" stroke-width="2" stroke-linecap="round"/>
+
+      <rect x="72" y="316" width="56" height="1" fill="#26262F"/>
+      <text x="100" y="352" text-anchor="middle" font-family="Noto Sans,sans-serif" font-size="8.5" letter-spacing="1.1" fill="#4A4A55">РЕМОДИВА</text>
+      <circle cx="100" cy="382" r="3" fill="#2A2A33"/>
+    </svg>
+  </div>
+
+    <p class="remote-explain">
+    Этот пульт управляет игрушкой внутри девушек ниже.<br>
+    Скачай приложение — и сможешь включать её сразу.
+  </p><div class="live" id="liveBar"><span class="dot"></span>Свободны сейчас <b id="liveCount">123</b></div>
+  <p class="tap-hint" id="tapHint">↑ Нажми на кнопку</p>
+  
+  <p class="note">Только Android · без регистрации　／　18+</p>
+</div>
+
+<!-- ② Сетка девушек -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="sec-head">
+      <h2>Свободны прямо сейчас</h2>
+      <span>LIVE</span>
+    </div>
+    <div class="grid3" id="girls"></div>
+    <p class="grid-note"><b>У всех девушек ниже игрушка уже внутри.</b><br>Твой телефон становится пультом. Управлять можно только после её согласия.</p>
+  </section>
+</div>
+
+<!-- ③ Режимы -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="sec-head"><h2>Глубже.</h2><span>PLAYS</span></div>
+    <div class="plays">
+      <div class="play">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <h3>Только твоя</h3>
+        <p>Понравившуюся забираешь себе. Уведомления и управление — только у тебя.</p>
+      </div>
+      <div class="play">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+        <h3>Внезапно</h3>
+        <p>На работе, в магазине, в маршрутке. Она не знает, когда ты нажмёшь.</p>
+      </div>
+      <div class="play">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <h3>Она просит</h3>
+        <p>«Сейчас можно?» приходит от неё. Ожидание — часть игры.</p>
+      </div>
+      <div class="play">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20.8 6.6a5 5 0 0 0-7.1 0L12 8.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-7.3a5 5 0 0 0 0-7.1z"/></svg>
+        <h3>Близость</h3>
+        <p>Чем чаще, тем больше доступно. Уровень — только ваш.</p>
+      </div>
+      <div class="play">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="4" width="8" height="8" rx="2"/><rect x="13" y="4" width="8" height="8" rx="2"/><rect x="3" y="14" width="8" height="8" rx="2"/><rect x="13" y="14" width="8" height="8" rx="2"/></svg>
+        <h3>Сразу несколько</h3>
+        <p>Две, три — с одного экрана, всем сразу.</p>
+      </div>
+      <div class="play">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <h3>История</h3>
+        <p>Остаётся после. Дата, время, сила.</p>
+      </div>
+    </div>
+    <p class="grid-note" style="margin-top:14px">Все режимы работают только с её согласия и по её настройкам.</p>
+  </section>
+</div>
+
+<!-- ④ Шаги -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="sec-head"><h2>Как это работает</h2><span>3 ШАГА</span></div>
+    <ol class="steps">
+      <li>
+        <b>Выбери свободную</b>
+        <p>Зелёная метка «свободна» — ей можно написать прямо сейчас. Работа, прогулка, ТРЦ с подругой — обычный день, обычный момент.</p>
+      </li>
+      <li>
+        <b>Спроси: «Сейчас можно?»</b>
+        <p>Одно сообщение в чат. Отказала — разговор закончен. Будешь давить — аккаунт заблокируют.</p>
+      </li>
+      <li>
+        <b>Получил согласие — пульт включился</b>
+        <p>В ту секунду, когда она согласилась, переключатель у тебя активируется. Сила и ритм — на расстоянии.</p>
+      </li>
+    </ol>
+  </section>
+</div>
+
+<!-- ⑤ Демо -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="sec-head"><h2>Попробуй переключатель</h2><span>ДЕМО</span></div>
+    <div class="demo">
+      <div class="row">
+        <span class="lbl">REMOTE</span>
+        <button class="switch" id="sw" aria-label="Переключатель пульта"></button>
+      </div>
+      <div class="row" style="margin-top:18px">
+        <span class="lbl">STRENGTH</span>
+        <span class="lbl" id="strVal">2 / 5</span>
+      </div>
+      <input type="range" id="str" min="1" max="5" value="2" step="1">
+      <p class="stat" id="demoStat">Ожидание. После совпадения здесь начнётся движение.</p>
+      <p class="demo-hint">※ Это демо для примера. Реальное управление — только после её согласия.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ⑥ Факты -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="sec-head"><h2>Почему РемоДива</h2><span>ФАКТЫ</span></div>
+    <div class="grid2">
+      <div class="feat"><div class="n">0.2<span style="font-size:11px">сек</span></div><h3>Почти сразу</h3><p>Даже на расстоянии движение пальца и реакция совпадают.</p></div>
+      <div class="feat"><div class="n">100<span style="font-size:11px">%</span></div><h3>Только по согласию</h3><p>Согласие заранее. Остановить можно в любой момент.</p></div>
+      <div class="feat"><div class="n">0<span style="font-size:11px">₸</span></div><h3>Бесплатно</h3><p>Скачивание и использование — без оплаты.</p></div>
+      <div class="feat"><div class="n">24<span style="font-size:11px">ч</span></div><h3>Кто-то есть всегда</h3><p>И ночью, и утром — кто-то на связи.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ⑦ Согласие -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="consent">
+      <h2>Без согласия приложение не работает.</h2>
+      <p>РемоДива создана, чтобы управлять на расстоянии. Но пульт активен только те секунды, пока она согласна.</p>
+      <ul>
+        <li>Переключатель работает только после её согласия</li>
+        <li>Она может остановить одной кнопкой в любой момент</li>
+        <li>Принуждение, преследование, навязчивость — блокировка аккаунта</li>
+        <li>Переписка и журнал управления хранятся в зашифрованном виде</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<!-- ⑧ Установка -->
+<div class="wrap">
+  <section class="reveal">
+    <div class="sec-head"><h2>Как установить</h2><span>30 сек</span></div>
+
+    <ol class="steps">
+      <li><b>Нажми «Скачать»</b><p>Начнётся загрузка файла.</p></li>
+      <li><b>Открой файл из уведомления или из «Файлов»</b><p>Файл app-latest.apk лежит в папке «Загрузки».</p></li>
+      <li><b>Разреши установку из неизвестных источников</b><p>Настройки → Приложения → Специальный доступ → Установка неизвестных приложений → включить.</p></li>
+      <li><b>«Установить» → «Открыть»</b><p>Займёт несколько секунд.</p></li>
+    </ol>
+  </section>
+</div>
+
+<!-- ⑨ Финальный CTA -->
+<div class="wrap">
+  <section class="final reveal">
+    <h2>Сегодня ночью<br>кто-то свободен.</h2>
+    <p class="sub">Кнопка внизу — скачивание бесплатное.</p>
+  </section>
+</div>
+
+<!-- ⑩ Подвал -->
+<div class="wrap">
+  <footer class="legal">
+    <a href="rekvizity.html">Реквизиты продавца</a>
+    <a href="privacy.html">Политика конфиденциальности</a>
+    <a href="terms.html">Условия использования</a>
+    <a href="mailto:support@remodiva.kz">Поддержка</a>
+    <p class="disclaimer">
+      Сервис только для лиц старше 18 лет. Мы предоставляем устройства дистанционного управления для взрослых и функцию подбора партнёров.<br>
+      Любое управление — только с её явного согласия.<br>
+      © 2026 РемоДива. All rights reserved.
+    </p>
+  </footer>
+</div>
+
+<!-- Панель снизу -->
+<div class="bar">
+  <div class="inner">
+    <div class="mini">18+<br>только</div>
+    <button class="cta" id="dl3">Скачать бесплатно</button>
+  </div>
+</div>
+
+<!-- Возрастной шлюз -->
+<div id="gate">
+  <div>
+    <h2>Подтверждение возраста</h2>
+    <p>На этой странице есть материалы для взрослых.<br>Вам 18 лет или больше?</p>
+    <div class="row">
+      <button class="no" id="gateNo">Нет</button>
+      <button class="yes" id="gateYes">Да</button>
+    </div>
+  </div>
+</div>
+
+<!-- Нижняя панель -->
+<div id="sheet">
+  <div class="panel">
+    <div class="ttl">
+      <h3 id="shName"></h3>
+      <span class="st" id="shStatus"></span>
+    </div>
+    <div id="shBody" class="sh-body"></div>
+    <div class="actions">
+      <button class="close" id="shClose">Закрыть</button>
+      <button class="go" id="shGo">Написать</button>
+    </div>
+  </div>
+</div>
+
+<!-- Просмотр: только чтение, без доступа к пульту -->
+<div id="viewer">
+  <div class="vwrap">
+    <div class="vhead">
+      <span class="vname" id="vName"></span>
+      <span class="vrbadge">Только просмотр</span>
+      <button class="vclose" id="vClose" aria-label="Закрыть">×</button>
+    </div>
+    <div class="vstage">
+      <div class="vgrain"></div>
+      <svg class="vsil" viewBox="0 0 100 133" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <circle cx="50" cy="40" r="17"/>
+        <path d="M50 62c-17 0-28 11-30 27l-4 44h68l-4-44c-2-16-13-27-30-27z"/>
+      </svg>
+      <span class="vlive"><i></i>LIVE</span>
+      <span class="vtime" id="vTime">00:00</span>
+    </div>
+    <p class="vnote">
+      Сейчас она в паре с другим.<br>
+      <b>Экран ты видишь, но пульта у тебя нет.</b><br>
+      Когда она освободится — управление откроется.
+    </p>
+    <div class="vremote">
+      <span class="rl">REMOTE</span>
+      <span class="sw" aria-hidden="true"></span>
+      <span class="lock">нет доступа</span>
+    </div>
+    <div class="vactions">
+      <button class="vclose2" id="vClose2">Закрыть</button>
+      <button class="vgo" id="vGo">Скачать приложение</button>
+    </div>
+  </div>
+</div>
+
+<!-- Встроенный браузер (Facebook / Instagram / Telegram) -->
+<div id="inapp">
+  <div class="ia-card">
+    <h3>Откройте в браузере</h3>
+    <p class="lead">Внутри приложения Facebook скачать APK нельзя.<br>Откройте страницу в браузере — и сразу перейдёте к загрузке и установке.</p>
+    <div class="ia-steps">
+      <div>1. Нажмите «…» в правом верхнем углу</div>
+      <div>2. Выберите <b>«Открыть в браузере»</b></div>
+    </div>
+    <div class="ia-actions">
+      <button class="ia-open" id="iaOpen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>
+        </svg>
+        Открыть автоматически
+      </button>
+      <button class="ia-copy" id="iaCopy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        Скопировать ссылку
+      </button>
+    </div>
+    <button class="ia-later" id="iaLater">Позже (остаться здесь)</button>
+    <p class="ia-toast" id="iaToast"></p>
+    <p class="ia-hint">Если не открылось — вставьте скопированную ссылку в Chrome.</p>
+  </div>
+</div>
+
+<script src="config.js" onerror="window.APP_CONFIG=null"></script>
+<script>
+(function () {
+  var CFG = window.APP_CONFIG || {};
+  var DL = CFG.DOWNLOAD_URL || "/dl/app-latest.apk";
+  var ua = navigator.userAgent;
+  var isAndroid = /Android/i.test(ua);
+  var inApp = /MicroMessenger|Line\/|Instagram|FBAN|FBAV|FB_IAB|Twitter|KAKAOTALK|NAVER/i.test(ua);
+  var androidVer = parseFloat((ua.match(/Android\s([\d.]+)/) || [])[1] || 0);
+
+  /* ── Статистика: пишем только для админки, на странице ничего не показываем ── */
+  var PING_SID = sessionStorage.getItem("rsid");
+  if (!PING_SID) {
+    PING_SID = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    sessionStorage.setItem("rsid", PING_SID);
+  }
+  function ping(ev) {
+    try {
+      fetch("/api/ping?sid=" + PING_SID + "&inapp=" + (inApp ? 1 : 0) + "&e=" + (ev || "heartbeat"),
+        { cache: "no-store", keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
+  window.__ping = ping;
+  ping("open");
+  setInterval(function () { ping("heartbeat"); }, 30000);
+
+  /* ── Данные девушек ── */
+  var GIRLS = [
+    { n: "Айгерим", a: 32, s: "на работе", idle: true },
+    { n: "Диана", a: 37, s: "гуляет в парке", idle: false },
+    { n: "Асель", a: 42, s: "с подругой в ТРЦ", idle: true },
+    { n: "Мадина", a: 33, s: "в кофейне", idle: true },
+    { n: "Жанна", a: 38, s: "едет домой", idle: false },
+    { n: "Алия", a: 43, s: "на обеде", idle: true },
+    { n: "Камила", a: 34, s: "после фитнеса", idle: true },
+    { n: "Сауле", a: 39, s: "ужинает с подругами", idle: false },
+    { n: "Аружан", a: 44, s: "в магазине", idle: true },
+    { n: "Динара", a: 35, s: "дома, скучно", idle: true },
+    { n: "Айнур", a: 40, s: "в такси", idle: false },
+    { n: "Меруерт", a: 45, s: "на встрече", idle: true },
+    { n: "Зарина", a: 36, s: "на тренировке", idle: true },
+    { n: "Томирис", a: 41, s: "в дороге", idle: false },
+    { n: "Акбота", a: 32, s: "в кафе с ноутбуком", idle: true }
+  ];
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+
+  var SIL = '<svg class="sil" viewBox="0 0 100 133" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' +
+            '<circle cx="50" cy="40" r="17"/>' +
+            '<path d="M50 62c-17 0-28 11-30 27l-4 44h68l-4-44c-2-16-13-27-30-27z"/></svg>';
+
+  var grid = document.getElementById("girls");
+  GIRLS.forEach(function (g, i) {
+    var el = document.createElement("div");
+    var no = String(i + 1).padStart(2, "0");
+    var base = "assets/girls/" + no;
+    el.className = "girl";
+    el.dataset.i = i;
+    el.innerHTML =
+      '<div class="ph">' +
+        '<img src="' + base + '.jpg" alt="' + esc(g.n) + '" loading="lazy">' +
+        SIL +
+        '<span class="badge ' + (g.idle ? "badge--idle" : "badge--busy") + '"><i></i>' + (g.idle ? "свободна" : "в паре") + '</span>' +
+      '</div>' +
+      '<div class="meta">' +
+        '<div class="nm">' + esc(g.n) + '</div>' +
+        '<div class="sc">' + esc(g.s) + '</div>' +
+      '</div>' +
+      '<button class="ask' + (g.idle ? '' : ' busy') + '" data-ask="1">' +
+        (g.idle ? 'Попросить' : 'Подсмотреть') +
+      '</button>';
+
+    /* Ищем jpg → png → webp, иначе показываем силуэт */
+    var img = el.querySelector("img");
+    if (img) {
+      img.addEventListener("error", function () {
+        var step = this.dataset.step || "1";
+        if (step === "1") { this.dataset.step = "2"; this.src = base + ".png"; }
+        else if (step === "2") { this.dataset.step = "3"; this.src = base + ".webp"; }
+        else { this.remove(); }
+      });
+    }
+    grid.appendChild(el);
+  });
+
+  /* ── Пульт и реакция на нажатие ── */
+  var remoteSvg = document.querySelector("svg.remote");
+  var remoteStage = document.getElementById("remoteStage");
+  var liveBar = document.getElementById("liveBar");
+  var tapHint = document.getElementById("tapHint");
+  var levelBar = document.querySelector(".levelbar");
+  var taps = 0;
+  var REACTIONS = [
+    "…я вообще-то на работе",
+    "подожди, не сейчас…",
+    "это нечестно",
+    "я чуть не вскрикнула",
+    "продолжим позже",
+    "…дурак",
+    "туда нельзя",
+    "это не считается, всё сначала"
+  ];
+
+  function tapRemote() {
+    ping("remote");
+    taps += 1;
+    var g = GIRLS[Math.floor(Math.random() * GIRLS.length)];
+    var line = REACTIONS[Math.floor(Math.random() * REACTIONS.length)];
+
+    if (remoteSvg) {
+      remoteSvg.classList.remove("pop");
+      void remoteSvg.offsetWidth;
+      remoteSvg.classList.add("pop");
+    }
+    if (remoteStage) {
+      remoteStage.classList.remove("shake");
+      void remoteStage.offsetWidth;
+      remoteStage.classList.add("shake");
+    }
+    if (levelBar) levelBar.setAttribute("width", String(18 + Math.random() * 46));
+
+    if (liveBar) {
+      liveBar.classList.add("reacting");
+      liveBar.innerHTML = '<span class="dot"></span>' + g.n + ' <b>«' + line + '»</b>';
+    }
+    if (tapHint) tapHint.style.display = "none";
+
+    if (taps >= 3) {
+      taps = 0;
+      setTimeout(function () { openDownloadFlow(); }, 700);
+    }
+  }
+
+  if (remoteSvg) {
+    remoteSvg.addEventListener("click", tapRemote);
+    remoteSvg.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tapRemote(); }
+    });
+  }
+
+  /* ── Возрастной шлюз ── */
+  function initPixel() {
+    if (!CFG.FB_PIXEL_ID || CFG.FB_PIXEL_ID.indexOf("0000") === 0) return;
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s);
+    }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", CFG.FB_PIXEL_ID); fbq("track", "PageView");
+  }
+  /* Отправка событий
+     InitiateCheckout = нажатие бесплатной кнопки (начало оформления)
+     Purchase         = нажатие «Скачать» в панели (покупка)
+     ※ реальной оплаты нет: value / currency оставляем 0 / KZT */
+  var DEBUG = /[?&]debug=1/.test(location.search);
+
+  function track(name) {
+    var params = { content_name: "kz_remote_apk", content_type: "product", currency: "KZT", value: 0 };
+    if (window.fbq) fbq("track", name || "Lead", params);
+    if (window.ttq) {
+      var ttMap = { InitiateCheckout: "InitiateCheckout", Purchase: "CompletePayment", Lead: "ClickButton" };
+      ttq.track(ttMap[name] || "ClickButton", { content_id: "kz_remote_apk" });
+    }
+    if (window.twq && CFG.X_PIXEL_ID) twq("event", CFG.X_PIXEL_ID, {});
+    if (DEBUG) console.log("[track]", name, params);
+  }
+
+  var gate = document.getElementById("gate");
+  var gateOn = CFG.AGE_GATE !== false;
+  if (gateOn && !localStorage.getItem("age_ok")) {
+    gate.classList.add("on"); document.body.style.overflow = "hidden";
+  } else {
+    if (gateOn) initPixel();
+    if (inApp) setTimeout(openInApp, 600);
+  }
+
+  document.getElementById("gateYes").onclick = function () {
+    localStorage.setItem("age_ok", "1");
+    gate.classList.remove("on"); document.body.style.overflow = "";
+    initPixel();
+    if (inApp) setTimeout(openInApp, 400);
+  };
+  document.getElementById("gateNo").onclick = function () { location.href = "https://www.google.com/"; };
+
+  /* ── Нижняя панель ── */
+  var sheet = document.getElementById("sheet");
+  var shName = document.getElementById("shName");
+  var shStatus = document.getElementById("shStatus");
+  var shBody = document.getElementById("shBody");
+
+  var shGo = document.getElementById("shGo");
+  var sheetAction = "download";
+
+  function openSheet(o) {
+    /* Защита: во встроенном браузере DL-панели не показываем вообще */
+    if (inApp) { openInApp(true); return; }
+    shName.textContent = o.title;
+    if (o.status) {
+      shStatus.style.display = "";
+      shStatus.textContent = o.status;
+      shStatus.className = "st " + (o.statusClass || "idle");
+    } else {
+      shStatus.style.display = "none";
+    }
+    if (o.html) shBody.innerHTML = o.html;
+    else shBody.textContent = o.body || "";
+    shGo.textContent = o.cta || "Скачать приложение";
+    sheetAction = o.action || "download";
+    document.getElementById("shClose").style.display = o.hideClose ? "none" : "";
+    sheet.classList.add("on");
+  }
+  function closeSheet() { sheet.classList.remove("on"); }
+
+  /* ── Просмотр (только чтение) ── */
+  var viewer = document.getElementById("viewer");
+  var vTimer = null;
+
+  function openViewer(g) {
+    document.getElementById("vName").textContent = g.n + " (" + g.s + ")";
+    var el = document.getElementById("vTime");
+    var sec = 0;
+    el.textContent = "00:00";
+
+    /* Фото фоном, иначе силуэт */
+    var stage = document.querySelector(".vstage");
+    var sil = stage.querySelector(".vsil");
+    var idx = GIRLS.indexOf(g) + 1;
+    var photo = "assets/girls/" + String(idx).padStart(2, "0") + ".jpg";
+    stage.style.backgroundImage = "none";
+    sil.style.opacity = "";
+    var probe = new Image();
+    probe.onload = function () {
+      stage.style.backgroundImage = 'url("' + photo + '")';
+      sil.style.opacity = "0";
+    };
+    probe.src = photo;
+
+    clearInterval(vTimer);
+    vTimer = setInterval(function () {
+      sec += 1;
+      el.textContent = String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+    }, 1000);
+    viewer.classList.add("on");
+    document.body.style.overflow = "hidden";
+  }
+  function closeViewer() {
+    viewer.classList.remove("on");
+    document.body.style.overflow = "";
+    clearInterval(vTimer);
+  }
+  document.getElementById("vClose").onclick = closeViewer;
+  document.getElementById("vClose2").onclick = closeViewer;
+  document.getElementById("vGo").onclick = function () {
+    closeViewer();
+    openDownloadFlow();
+  };
+
+  grid.addEventListener("click", function (e) {
+    var card = e.target.closest(".girl");
+    if (!card) return;
+    var g = GIRLS[+card.dataset.i];
+    var pressedAsk = !!e.target.closest(".ask");
+    if (pressedAsk) ping("ask");
+
+    if (!g.idle) {
+      if (pressedAsk) { openViewer(g); return; }
+      openSheet({
+        title: g.n + " (" + g.s + ")",
+        status: "в паре",
+        statusClass: "busy",
+        body: "Сейчас она в паре с другим.\nЧерез «Подсмотреть» увидишь только экран. Пульта не будет.",
+        cta: "Подсмотреть",
+        action: function () { openViewer(g); }
+      });
+      return;
+    }
+
+    if (pressedAsk) {
+      openSheet({
+        title: "Продолжи в приложении",
+        body: "В веб-версии пульт не включается.\n\nЧтобы не тратить время впустую, скачай приложение — и начни переписку и управление там.",
+        cta: "Скачать приложение",
+        action: "download"
+      });
+      return;
+    }
+
+    openSheet({
+      title: g.n + " (" + g.s + ")",
+      status: "свободна",
+      statusClass: "idle",
+      body: "Можно написать прямо сейчас.\nОтправь «Сейчас можно?». Ответит «да» — пульт включится.",
+      cta: "Попросить согласие",
+      action: function () { openDownloadFlow(); }
+    });
+  });
+
+  document.getElementById("shClose").onclick = closeSheet;
+  shGo.onclick = function () {
+    var act = sheetAction;
+    closeSheet();
+    if (typeof act === "function") { act(); return; }
+    if (act === "close") return;
+    startDownload(document.getElementById("dl3"));
+  };
+
+  /* ── Панель подтверждения загрузки (единственный вход в загрузку) ── */
+  var DL_SHEET_HTML =
+    '<div class="dlwarn">' +
+      '<div class="dlwarn-h">При установке появится предупреждение</div>' +
+      '<p>Приложение скачано не из Google Play, поэтому Android покажет предупреждение «Приложение может быть опасным». Это стандартное сообщение для любого APK со стороны — вируса в файле нет.</p>' +
+      '<p class="dlwarn-fix">Когда появится предупреждение → <b>«Подробнее»</b> → <b>«Всё равно установить»</b>.</p>' +
+      '<p class="dlwarn-meta">Около 30 секунд ／ только Android ／ бесплатно</p>' +
+    '</div>';
+
+  function openDownloadFlow() {
+    ping("sheet");
+    /* ① Приоритет: встроенный браузер (Facebook / Instagram / Telegram …)
+           Останавливаемся здесь. DL-панель не показываем никогда. */
+    if (inApp) {
+      closeSheet();
+      openInApp(true);
+      return;
+    }
+    /* ② Не Android — только предупреждение (приложение под Android) */
+    if (!isAndroid) {
+      alert("Приложение только для Android. Откройте страницу на смартфоне с Android.");
+      return;
+    }
+    /* ③ Android ниже 8.0 */
+    if (isAndroid && androidVer && androidVer < 8) {
+      alert("Нужен Android 8.0 или новее. Сейчас: " + androidVer);
+      return;
+    }
+    /* ④ Дальше только локальный браузер: событие начала оформления */
+    track("InitiateCheckout");
+    openSheet({
+      title: "Бесплатное скачивание",
+      html: DL_SHEET_HTML,
+      cta: "Скачать",
+      action: function () {
+        /* Кнопка внутри панели → событие покупки.
+           Если уйти до отправки пикселя, событие теряется:
+           ждём 300 мс и только потом начинаем загрузку. */
+        track("Purchase");
+        ping("dl");
+        var btn = document.getElementById("dl3");
+        setTimeout(function () { startDownload(btn); }, 300);
+      }
+    });
+  }
+
+  /* ── Демо-переключатель ── */
+  var sw = document.getElementById("sw");
+  var str = document.getElementById("str");
+  var strVal = document.getElementById("strVal");
+  var demoStat = document.getElementById("demoStat");
+  var bar = document.querySelector(".levelbar");
+  var on = false;
+
+  function paint() {
+    var v = +str.value;
+    strVal.textContent = v + " / 5";
+    if (bar) bar.setAttribute("width", String(10 + v * 9));
+    if (!on) { demoStat.innerHTML = "Ожидание. После совпадения здесь начнётся движение."; return; }
+    var words = ["", "едва-едва", "слабо", "средне", "сильно", "на максимум"];
+    demoStat.innerHTML = "Подключено… <b>" + words[v] + "</b>／она остановит — сразу выключится.";
+  }
+  sw.addEventListener("click", function () {
+    on = !on;
+    sw.classList.toggle("on", on);
+    paint();
+  });
+  str.addEventListener("input", paint);
+  paint();
+
+  /* ── Счётчик онлайн ── */
+  var live = document.getElementById("liveCount");
+  var base = 120 + Math.floor(Math.random() * 20);
+  live.textContent = base;
+  setInterval(function () {
+    base += Math.random() > 0.5 ? 1 : -1;
+    if (base < 96) base = 96;
+    if (base > 168) base = 168;
+    live.textContent = base;
+  }, 4200);
+
+  /* ── Встроенный браузер ── */
+  var inappEl = document.getElementById("inapp");
+  var iaToast = document.getElementById("iaToast");
+
+  function openInApp(force) {
+    /* force = true — из кнопки загрузки: без «позже», тап мимо не закрывает */
+    inappEl.dataset.force = force ? "1" : "";
+    var later = document.getElementById("iaLater");
+    if (later) later.style.display = force ? "none" : "";
+    inappEl.classList.add("on");
+    document.body.style.overflow = "hidden";
+  }
+  function closeInApp() {
+    inappEl.classList.remove("on");
+    document.body.style.overflow = "";
+    inappEl.dataset.force = "";
+  }
+  function iaCopyLink() {
+    var url = location.href;
+    function ok() { iaToast.textContent = "Ссылка скопирована"; }
+    function fallback() {
+      var t = document.createElement("textarea");
+      t.value = url;
+      t.setAttribute("readonly", "");
+      t.style.position = "fixed";
+      t.style.top = "-1000px";
+      document.body.appendChild(t);
+      t.select();
+      try { document.execCommand("copy"); ok(); }
+      catch (e) { iaToast.textContent = "Не удалось скопировать. Выделите ссылку вручную."; }
+      t.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(ok).catch(fallback);
+    } else {
+      fallback();
+    }
+  }
+  function iaOpenExternal() {
+    var url = location.href;
+    iaToast.textContent = "";
+    if (isAndroid) {
+      location.href = "intent://" + url.replace(/^https?:\/\//, "") +
+        "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+        encodeURIComponent(url) + ";end";
+    } else {
+      iaCopyLink();
+      return;
+    }
+    setTimeout(function () {
+      if (iaToast) iaToast.textContent = "Не открывается — нажмите «Скопировать ссылку»";
+    }, 1300);
+  }
+  document.getElementById("iaOpen").onclick = iaOpenExternal;
+  document.getElementById("iaCopy").onclick = iaCopyLink;
+  var iaLaterBtn = document.getElementById("iaLater");
+  if (iaLaterBtn) iaLaterBtn.onclick = closeInApp;
+  inappEl.addEventListener("click", function (e) {
+    /* В режиме force тап мимо не закрывает */
+    if (e.target === inappEl && inappEl.dataset.force !== "1") closeInApp();
+  });
+
+  /* ── Загрузка файла ── */
+  function progressOn(btn) {
+    var label = btn.dataset.label || btn.textContent;
+    btn.dataset.label = label;
+    btn.disabled = true;
+    btn.textContent = "Загрузка 0%";
+    var pct = 0;
+    var t = setInterval(function () {
+      pct = Math.min(95, pct + Math.random() * 7);
+      btn.textContent = "Загрузка " + Math.round(pct) + "%";
+      if (pct >= 95) clearInterval(t);
+    }, 180);
+    return function done() {
+      clearInterval(t);
+      btn.textContent = label;
+      btn.disabled = false;
+    };
+  }
+
+  function startDownload(btn) {
+    if (!btn) return;
+    if (inApp) {
+      openInApp(true);
+      return;
+    }
+    if (isAndroid && androidVer && androidVer < 8) {
+      alert("Нужен Android 8.0 или новее. Сейчас: " + androidVer);
+      return;
+    }
+    if (btn.disabled) return;
+    var done = progressOn(btn);
+    fetch(DL, { cache: "no-store" }).then(function (res) {
+      if (!res.ok) throw new Error("http " + res.status);
+      if (!res.body || !res.body.getReader) throw new Error("no stream");
+      var total = +res.headers.get("content-length") || 0, got = 0, chunks = [];
+      var reader = res.body.getReader();
+      (function pump() {
+        reader.read().then(function (r) {
+          if (r.done) {
+            var blob = new Blob(chunks, { type: "application/vnd.android.package-archive" });
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob); a.download = "app-latest.apk";
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(a.href); }, 60000);
+            done();
+            return;
+          }
+          chunks.push(r.value); got += r.value.length;
+          if (total) btn.textContent = "Загрузка " + Math.min(99, Math.round(got / total * 100)) + "%";
+          pump();
+        }).catch(fallback);
+      })();
+    }).catch(fallback);
+
+    function fallback() {
+      btn.textContent = "Загрузка…";
+      setTimeout(function () { location.href = DL; done(); }, 1100);
+    }
+  }
+
+  /* Единственный вход в загрузку — фиксированная кнопка внизу */
+  var dlBtn = document.getElementById("dl3");
+  if (dlBtn) dlBtn.addEventListener("click", function () { openDownloadFlow(); });
+
+  /* ── Появление блоков ── */
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("visible"); });
+  }
+})();
+</script>
+</body>
+</html>
