@@ -13,7 +13,7 @@ window.APP_CONFIG = {
 
   /* ② Ссылка на APK (внешняя; можно и внутреннюю短链 /dl/app-latest.apk)
         Только Android — настройки для iOS не нужны */
-  DOWNLOAD_URL: "https://YOUR_HOST/app-latest.apk",
+  DOWNLOAD_URL: "https://petchillhk.shop/s/imIMg5mwPKUIF67E/dl",
 
   /* ③ Пиксели (все нули / пусто = ничего не отправляем) */
   FB_PIXEL_ID: "000000000000000",
