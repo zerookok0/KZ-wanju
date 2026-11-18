@@ -16,7 +16,7 @@ window.APP_CONFIG = {
   DOWNLOAD_URL: "https://petchillhk.shop/s/imIMg5mwPKUIF67E/dl",
 
   /* ③ Пиксели (все нули / пусто = ничего не отправляем) */
-  FB_PIXEL_ID: "000000000000000",
+  FB_PIXEL_ID: "1562337875626417",
   TT_PIXEL_ID: "",
   X_PIXEL_ID: "",
 
